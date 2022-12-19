@@ -1,12 +1,14 @@
 package com.pushkarev.chartographer.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,14 +21,19 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.pushkarev.chartographer.config.SwaggerConfiguration;
 import com.pushkarev.chartographer.service.ChartaServiceImpl;
 import com.pushkarev.chartographer.service.exceptions.ChartaInvalidCoordinateException;
 import com.pushkarev.chartographer.service.exceptions.ChartaNotFoundException;
 import com.pushkarev.chartographer.service.exceptions.InvalidContentTypeException;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/chartas")
 @Validated
+@Api(tags = {SwaggerConfiguration.API_TAG})
 public class Controller {
 
 	@Autowired
@@ -45,6 +52,7 @@ public class Controller {
 	private final static int MIN_HEIGHT_OF_PART_OF_CHARTA = 1;
 
 	@PostMapping("/")
+	@ApiOperation("Create new charta")
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public String createNewCharta(@RequestParam @Min(1) @Max(MAX_WITDH_OF_CHARTA) int width,
 			@RequestParam @Min(1) @Max(MAX_HEIGHT_OF_CHARTA) int height) throws IOException {
@@ -53,6 +61,7 @@ public class Controller {
 	}
 
 	@PostMapping(value = "/{id}/")
+	@ApiOperation("Add part to charta")
 	@ResponseStatus(code = HttpStatus.OK)
 	public void addPartToCharta(
 			@PathVariable String id, 
@@ -71,6 +80,7 @@ public class Controller {
 	}
 
 	@GetMapping(value = "/{id}/", produces = "image/bmp")
+	@ApiOperation("Get part of charta")
 	@ResponseStatus(code = HttpStatus.OK)
 	@ResponseBody
 	public byte[] getPartOfCharta(
@@ -83,8 +93,17 @@ public class Controller {
 
 		return chartaService.getPartOfChartaAsByteArray(id, x, y, width, height);
 	}
+	
+	@GetMapping(value = "/all/", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation("Get all chartas")
+	@ResponseStatus(code = HttpStatus.OK)
+	@ResponseBody
+	public List<byte[]> getAllChartas() throws IOException, ChartaNotFoundException {
+		return chartaService.getAllChartas();
+	}
 
 	@DeleteMapping("/{id}/")
+	@ApiOperation("Delete charta")
 	@ResponseStatus(code = HttpStatus.OK)
 	public void deleteCharta(@PathVariable String id) throws ChartaNotFoundException, IOException {
 

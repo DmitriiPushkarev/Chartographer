@@ -1,6 +1,7 @@
 package com.pushkarev.chartographer.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,8 @@ public interface ChartaService {
 
 	public byte[] getPartOfChartaAsByteArray(String id, int x, int y, int width, int height)
 			throws IOException, ChartaNotFoundException, ChartaInvalidCoordinateException;
+	
+	public List<byte[]> getAllChartas() throws IOException, ChartaNotFoundException;
 
 	public void deleteChartaById(String id) throws ChartaNotFoundException, IOException;
 }

@@ -134,6 +134,37 @@ public class ChartaServiceImpl implements ChartaService {
 			throw new IOException(DEFAULT_EXCEPTION_MESSAGE + e.getMessage(), e);
 		}
 	}
+	
+	@Override
+	public List<byte[]> getAllChartas() throws IOException, ChartaNotFoundException {
+		
+		List<byte[]> chartas = new ArrayList<>();
+		
+		if(idsOfChartas.isEmpty()) {
+			throw new ChartaNotFoundException(DEFAULT_EXCEPTION_MESSAGE);
+		}
+		
+		for(int i = 0; i < idsOfChartas.size(); i++) {
+			
+			try {
+			File pathOfCharta = new File(getPathOfTargetFolder() + idsOfChartas.get(i) + "." + CONTENT_TYPE_OF_CHARTA);
+			
+			BufferedImage charta = ImageIO.read(pathOfCharta);
+			
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			
+			ImageIO.write(charta, CONTENT_TYPE_OF_CHARTA, baos);
+			
+			chartas.add(baos.toByteArray());
+			
+			baos.close();
+			} catch (IOException e) {
+				throw new IOException(DEFAULT_EXCEPTION_MESSAGE + e.getMessage(), e);
+			}
+		}
+		
+		return chartas;
+	}
 
 	@Override
 	public void deleteChartaById(String id) throws ChartaNotFoundException, IOException {
